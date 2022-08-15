@@ -33,3 +33,6 @@
 
 # Exectable Directory
 executables
+
+# test files
+test*

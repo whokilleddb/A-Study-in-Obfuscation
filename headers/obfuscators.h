@@ -14,3 +14,20 @@ void XOR(unsigned char * payload, unsigned int payload_len, const char * xor_key
         j++;
     }
 }
+
+
+
+// Print the contents of an address in hex
+// Used for debugging purposes only
+//
+// void print_hex(unsigned char *payload, unsigned int payload_len){
+//     int i;
+//    
+//     printf("{");
+//     for (i=0; i<payload_len; i++){
+//         printf("0x%02x, ", payload[i]);
+//
+//     }
+//     printf("}\n");
+//    
+// }

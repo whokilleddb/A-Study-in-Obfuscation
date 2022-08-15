@@ -325,3 +325,15 @@ This seemed to have drastically bring down the detection scores. Thats's a huge 
 
 ![Level3 Analysis]()
 
+
+## Level 4 - Going Bases
+
+Next up, we try to encode our payload using the good ol' **Base64** encoding technique to mask our payload a tad bit more. We generate the Base64 encoded payload using `Obfuscator.level2()` which does everything upto `Obfuscator.level1()` plus base64 encodes the whole thing. This is just one step out many more which we can employ to add an extra layer of obfuscation to our payload
+
+### Antiscan Analysis
+
+This doesn't really have such an adverse effect on the detection rates. However, any obfuscation is a plus in the end.
+
+[**Antiscan Score: x/26**]()
+
+![Level3 Analysis]()
