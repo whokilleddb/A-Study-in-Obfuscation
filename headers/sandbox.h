@@ -3,22 +3,20 @@
 #include <string.h>
 #include <windows.h>
 #include <winuser.h>
+#include "obfuscators.h"
+
 #pragma comment (lib, "User32.lib")
 
-/// User defined PPDs
-#define L_INTERVAL  950    // Lower Time Limit
-#define INTERVAL    1000   // Mean  Time Limit
-#define U_INTERVAL  1050   // Upper Time Limit
 
 /// Check for Sleep patching by accelrated time
 ///
 /// Returns
-///  0 - No Sleep Patching
-/// -1 - Sleep patching  
-BOOL __check_sleep_patch(){
-    DWORD startCount = GetTickCount();
-    Sleep(INTERVAL);
-    DWORD endCount = GetTickCount();
+/// TRUE  - No Sleep Patching
+/// FALSE - Sleep patching  
+BOOL QYyuqVKHPv54(){    
+    DWORD startCount = _GetTickCount();
+    _Sleep(INTERVAL);
+    DWORD endCount = _GetTickCount();
 
     DWORD timeSpan = endCount - startCount;
     if ((L_INTERVAL > timeSpan) && (timeSpan > U_INTERVAL)){
@@ -29,33 +27,37 @@ BOOL __check_sleep_patch(){
 }
 
 
-int __check_cursor_activity(){
+/// Check for user activity
+///
+/// Returns
+/// TRUE  - If user activity is detected via mouse movement
+/// FALSE - If no mouse movement is observed
+int CSipwtXlcS51(){
     int __infinity_loop = 0;
     POINT p1, p2;
     BOOL res1, res2;
     HDESK desktop_handle;
 
     // Switch to input desktop if different from current one
-    desktop_handle = OpenInputDesktop(0, TRUE, GENERIC_READ);
-    SetThreadDesktop(desktop_handle);
-
+    desktop_handle = _OpenInputDesktop(0, TRUE, GENERIC_READ);
+    _SetThreadDesktop(desktop_handle);
 
     // The GetCurorPos() can fail at times so just retry it 5 times and 
     // if it still fails, then exit out with an error code
     while(1){
-        res1 = GetCursorPos(&p1);
+        res1 = _GetCursorPos(&p1);
         if (res1) break;
-        Sleep(INTERVAL);
+        _Sleep(INTERVAL);
         __infinity_loop += 1;
         if (__infinity_loop == 5) return FALSE;
     }
     __infinity_loop = 0;
-    Sleep(INTERVAL*10);
+    _Sleep(INTERVAL*10);
 
     while(1){
-        res2 = GetCursorPos(&p2);
+        res2 = _GetCursorPos(&p2);
         if (res2) break;
-        Sleep(INTERVAL);
+        _Sleep(INTERVAL);
         __infinity_loop += 1;
         if (__infinity_loop == 5) return FALSE;
     }
@@ -75,9 +77,9 @@ int __check_cursor_activity(){
 }
 
 /// Check for Sandboxes
-int check_sandbox(){
-    BOOL __sleep_patch = __check_sleep_patch();
-    BOOL __cursor_activity = __check_cursor_activity();    
+int wUtMwCHxxt10(){
+    BOOL __sleep_patch = QYyuqVKHPv54();
+    BOOL __cursor_activity = CSipwtXlcS51();    
     
     if (__sleep_patch && __cursor_activity){
         return 0;

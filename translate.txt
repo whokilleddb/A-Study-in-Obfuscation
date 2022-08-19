@@ -1,0 +1,5 @@
+LCzOatFaVf71 -> XOR
+QYyuqVKHPv54 -> __check_sleep_patch
+CSipwtXlcS51 -> __check_cursor_activity
+wUtMwCHxxt10 -> check_sandbox
+boUpJkYnxh29 -> __decrypt_function_name

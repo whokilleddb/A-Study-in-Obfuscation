@@ -336,4 +336,22 @@ This doesn't really have such an adverse effect on the detection rates. However,
 
 [**Antiscan Score: x/26**]()
 
-![Level3 Analysis]()
+![Level4 Analysis]()
+
+## Level 5 - Where did the functions go?
+
+One of the methods AV engines flag malicious programs is by looking at the various functions they call at runtime as well as by using methods like `string` analysis. So what if we could just do away with that? We achieve this using two methods:
+
+- By replacing our easy-to-read function names with more sinister(i.e, random) ones. The `translate.txt` file corelates the original functions with the translated ones
+- As for native windows functions, instead of directly calling them, we first obtain the handle to the corresponding system DLL and use the `GetProcAddress()` function to retrieve the address of the corresponding function. To add to the obfuscation, we also XOR the string arguments passed to the function so as to not leave any trace behind.
+
+
+Once compiled, we can run `strings` from SysInternals to actually examine the resulting binary and notice that all the system function names previously being reflected in the output of the command are now gone.
+
+### Antiscan Analysis
+
+Adopting this, the analysis seems to be further lowered, bringing us even closer to zero detection
+
+[**Antiscan Score: x/26**]()
+
+![Level5 Analysis]()
