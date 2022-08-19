@@ -259,9 +259,9 @@ cl.exe /nologo /Ox /MT /W0 /GS- /DNDEBUG /Tcimplant.cpp /I "headers" /link /OUT:
 
 Okay, so this did not help much with the detection rates but nevertheless, is a good place to start with sandbox evasion techniques. 
 
-[**Antiscan Score: x/26**]()
+[**Antiscan Score: 15/26**](https://antiscan.me/scan/new/result?id=FDAPjz42vTip)
 
-![Level2 Analysis]()
+![Level2 Analysis](https://antiscan.me/images/result/FDAPjz42vTip.png)
 
 ## Level 3 - Where is the cursor?
 
@@ -321,9 +321,9 @@ We are keeping a track of the Cursor position. If the cursor doesn't move for a 
 
 This seemed to have drastically bring down the detection scores. Thats's a huge improvement considering the barely tampered with payload. 
 
-[**Antiscan Score: x/26**]()
+[**Antiscan Score: 8/26**](https://antiscan.me/scan/new/result?id=iyKaH5ChMD18)
 
-![Level3 Analysis]()
+![Level3 Analysis](https://antiscan.me/images/result/iyKaH5ChMD18.png)
 
 
 ## Level 4 - Going Bases
@@ -334,9 +334,9 @@ Next up, we try to encode our payload using the good ol' **Base64** encoding tec
 
 This doesn't really have such an adverse effect on the detection rates. However, any obfuscation is a plus in the end.
 
-[**Antiscan Score: x/26**]()
+[**Antiscan Score: 6/26**](https://antiscan.me/scan/new/result?id=YkOZYbkCWBnr)
 
-![Level4 Analysis]()
+![Level4 Analysis](https://antiscan.me/images/result/YkOZYbkCWBnr.png)
 
 ## Level 5 - Where did the functions go?
 
@@ -384,9 +384,9 @@ Once compiled, we can run `strings` from SysInternals to actually examine the re
 
 Adopting this, the analysis seems to be further lowered, bringing us even closer to zero detection
 
-[**Antiscan Score: x/26**]()
+[**Antiscan Score: 1/26**](https://antiscan.me/scan/new/result?id=M2xQpE6PZckd)
 
-![Level5 Analysis]()
+![Level5 Analysis](https://antiscan.me/images/result/M2xQpE6PZckd.png)
 
 ## Level 6 - Get your Fibers in!
 
@@ -418,6 +418,6 @@ Compiling with the usual intructions gives us our final executable.
 
 This seems to do wonders as it brings the detection rates to zero(atleast at the time of writing this) and I guess we can say that we now have an undetectable sus-looking-program running our shellcode.
 
-[**Antiscan Score: x/26**]()
+[**Antiscan Score: 0/26**](https://antiscan.me/scan/new/result?id=QEqWv42rdLiY)
 
-![Level5 Analysis]()
+![Level6 Analysis](https://antiscan.me/images/result/QEqWv42rdLiY.png)
