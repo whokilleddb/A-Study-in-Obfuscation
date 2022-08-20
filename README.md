@@ -159,9 +159,9 @@ This should create a `level0.exe` executable file in the current directory which
 ### Antiscan Analysis
 We see that most AV engines flag the binary and rightfully so because it barely contains any obfuscation and Metasploit payloads have well-defined signatures at this point.
 
-[**Antiscan Score: x/26**]()
+[**Antiscan Score: 13/26**](https://antiscan.me/scan/new/result?id=0HTHHCYEJBjq)
 
-![Level0 Analysis]()
+![Level0 Analysis](https://antiscan.me/images/result/0HTHHCYEJBjq.png)
 
 ## Level 1 - XOR it!
 
@@ -216,9 +216,9 @@ cl.exe /nologo /Ox /MT /W0 /GS- /DNDEBUG /Tcimplant.cpp /I "headers" /link /OUT:
 
 The encryprion does bring down the detection rates a bittle but still, there are ways to go :)
 
-[**Antiscan Score: x/26**]()
+[**Antiscan Score: 9/26**](https://antiscan.me/scan/new/result?id=6huOmULlMd25)
 
-![Level1 Analysis]()
+![Level1 Analysis](https://antiscan.me/images/result/6huOmULlMd25.png)
 
 ## Level 2 - Sleep Patching Sandbox
 
@@ -257,11 +257,11 @@ cl.exe /nologo /Ox /MT /W0 /GS- /DNDEBUG /Tcimplant.cpp /I "headers" /link /OUT:
 
 ### Antiscan Analysis
 
-Okay, so this did not help much with the detection rates but nevertheless, is a good place to start with sandbox evasion techniques. 
+Okay, so this did not help much with the detection rates, rather it increased the detection rate. However, we will give it the benefit of doubt and assume that there are some false positives. Another possible explanation might be the fact that some AV engines are flagging the signature for the function. Nevertheless, we keep it in our program and try to optimize it in the future.
 
-[**Antiscan Score: 15/26**](https://antiscan.me/scan/new/result?id=FDAPjz42vTip)
+[**Antiscan Score: 11/26**](https://antiscan.me/scan/new/result?id=qG7jq02xPNF9)
 
-![Level2 Analysis](https://antiscan.me/images/result/FDAPjz42vTip.png)
+![Level2 Analysis](https://antiscan.me/images/result/qG7jq02xPNF9.png)
 
 ## Level 3 - Where is the cursor?
 
